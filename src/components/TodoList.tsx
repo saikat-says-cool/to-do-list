@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { AddTodoForm } from "./AddTodoForm";
 import { TodoItem } from "./TodoItem";
 import {
@@ -9,39 +10,88 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { showError, showSuccess } from "@/utils/toast";
 
 interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
+  id: string;
+  task: string;
+  is_complete: boolean;
 }
 
 export const TodoList = () => {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: "Learn React", completed: false },
-    { id: 2, text: "Build a Todo App", completed: true },
-    { id: 3, text: "Deploy to production", completed: false },
-  ]);
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleAddTodo = (text: string) => {
-    const newTodo: Todo = {
-      id: Date.now(),
-      text,
-      completed: false,
-    };
-    setTodos([...todos, newTodo]);
+  const fetchTodos = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("todos")
+      .select("id, task, is_complete")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      showError("Could not fetch todos.");
+      console.error(error);
+    } else {
+      setTodos(data);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchTodos();
+  }, [fetchTodos]);
+
+  const handleAddTodo = async (task: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        showError("You must be logged in to add a todo.");
+        return;
+    }
+
+    const { data, error } = await supabase
+      .from("todos")
+      .insert([{ task, user_id: user.id }])
+      .select()
+      .single();
+
+    if (error) {
+      showError("Failed to add todo.");
+    } else if (data) {
+      setTodos([...todos, data]);
+      showSuccess("Todo added!");
+    }
   };
 
-  const handleToggleTodo = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
+  const handleToggleTodo = async (id: string) => {
+    const todoToToggle = todos.find((todo) => todo.id === id);
+    if (!todoToToggle) return;
+
+    const { error } = await supabase
+      .from("todos")
+      .update({ is_complete: !todoToToggle.is_complete })
+      .eq("id", id);
+
+    if (error) {
+      showError("Failed to update todo.");
+    } else {
+      setTodos(
+        todos.map((todo) =>
+          todo.id === id ? { ...todo, is_complete: !todo.is_complete } : todo
+        )
+      );
+    }
   };
 
-  const handleDeleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const handleDeleteTodo = async (id: string) => {
+    const { error } = await supabase.from("todos").delete().eq("id", id);
+
+    if (error) {
+      showError("Failed to delete todo.");
+    } else {
+      setTodos(todos.filter((todo) => todo.id !== id));
+      showSuccess("Todo deleted!");
+    }
   };
 
   return (
@@ -52,7 +102,9 @@ export const TodoList = () => {
       <CardContent>
         <AddTodoForm onAdd={handleAddTodo} />
         <div className="mt-4">
-          {todos.length > 0 ? (
+          {loading ? (
+            <p className="text-center text-muted-foreground">Loading todos...</p>
+          ) : todos.length > 0 ? (
             todos.map((todo) => (
               <TodoItem
                 key={todo.id}

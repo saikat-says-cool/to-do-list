@@ -6,15 +6,15 @@ import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
+  id: string;
+  task: string;
+  is_complete: boolean;
 }
 
 interface TodoItemProps {
   todo: Todo;
-  onToggle: (id: number) => void;
-  onDelete: (id: number) => void;
+  onToggle: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 export const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
@@ -22,17 +22,17 @@ export const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
     <div className="flex items-center gap-4 p-2 border-b">
       <Checkbox
         id={`todo-${todo.id}`}
-        checked={todo.completed}
+        checked={todo.is_complete}
         onCheckedChange={() => onToggle(todo.id)}
       />
       <label
         htmlFor={`todo-${todo.id}`}
         className={cn(
           "flex-1 text-left cursor-pointer",
-          todo.completed && "line-through text-muted-foreground"
+          todo.is_complete && "line-through text-muted-foreground"
         )}
       >
-        {todo.text}
+        {todo.task}
       </label>
       <Button variant="ghost" size="icon" onClick={() => onDelete(todo.id)}>
         <Trash2 className="h-4 w-4" />
