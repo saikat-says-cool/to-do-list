@@ -30,6 +30,7 @@ export const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
         id={`todo-${todo.id}`}
         checked={todo.is_complete}
         onCheckedChange={() => onToggle(todo.id)}
+        aria-label={`Mark ${todo.task} as ${todo.is_complete ? 'incomplete' : 'complete'}`}
       />
       <label
         htmlFor={`todo-${todo.id}`}
@@ -40,10 +41,10 @@ export const TodoItem = ({ todo, onToggle, onDelete }: TodoItemProps) => {
       >
         {todo.task}
       </label>
-      <Button variant="ghost" size="icon" onClick={handleCopy}>
+      <Button variant="ghost" size="icon" onClick={handleCopy} aria-label={`Copy todo: ${todo.task}`}>
         <Copy className="h-4 w-4" />
       </Button>
-      <Button variant="ghost" size="icon" onClick={() => onDelete(todo.id)}>
+      <Button variant="ghost" size="icon" onClick={() => onDelete(todo.id)} aria-label={`Delete todo: ${todo.task}`}>
         <Trash2 className="h-4 w-4" />
       </Button>
     </div>

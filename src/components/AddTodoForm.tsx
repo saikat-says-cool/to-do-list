@@ -26,6 +26,7 @@ export const AddTodoForm = ({ onAdd }: AddTodoFormProps) => {
         onChange={(e) => setText(e.target.value)}
         placeholder="Add a new todo"
         className="bg-white/80 dark:bg-black/80"
+        aria-label="Add a new todo"
       />
       <Button type="submit" className="bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold">Add</Button>
     </form>
