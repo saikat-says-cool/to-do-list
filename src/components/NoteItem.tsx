@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Trash2, Save, Edit, X } from "lucide-react";
+import { Trash2, Save, Edit, X, Copy } from "lucide-react";
+import { showSuccess } from "@/utils/toast";
 
 interface Note {
   id: string;
@@ -25,8 +26,13 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
     setIsEditing(false);
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(note.content);
+    showSuccess("Note copied to clipboard!");
+  };
+
   return (
-    <div className="p-2 border-b">
+    <div className="p-2 border-b animate-slide-in-up transition-colors hover:bg-muted/50">
       {isEditing ? (
         <div className="flex flex-col gap-2">
           <Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={4} />
@@ -39,6 +45,9 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
         <div className="flex items-start gap-4">
           <p className="flex-1 whitespace-pre-wrap py-2">{note.content}</p>
           <div className="flex gap-1">
+            <Button variant="ghost" size="icon" onClick={handleCopy}>
+              <Copy className="h-4 w-4" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
               <Edit className="h-4 w-4" />
             </Button>
