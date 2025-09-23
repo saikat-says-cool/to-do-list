@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AddTodoForm } from "./AddTodoForm";
 import { TodoItem } from "./TodoItem";
+import { TodoProgress } from "./TodoProgress";
 import {
   Card,
   CardContent,
@@ -94,12 +95,15 @@ export const TodoList = () => {
     }
   };
 
+  const completedCount = todos.filter(t => t.is_complete).length;
+
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md bg-white/60 dark:bg-black/60 backdrop-blur-lg border-violet-200/50">
       <CardHeader>
-        <CardTitle>My Todo List</CardTitle>
+        <CardTitle className="text-center text-2xl font-bold text-primary">My Todo List</CardTitle>
       </CardHeader>
       <CardContent>
+        <TodoProgress total={todos.length} completed={completedCount} />
         <AddTodoForm onAdd={handleAddTodo} />
         <div className="mt-4">
           {loading ? (

@@ -25,8 +25,9 @@ export const AddNoteForm = ({ onAdd }: AddNoteFormProps) => {
         onChange={(e) => setContent(e.target.value)}
         placeholder="Add a new note"
         rows={4}
+        className="bg-white/80 dark:bg-black/80"
       />
-      <Button type="submit" className="self-end">Add Note</Button>
+      <Button type="submit" className="self-end bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold">Add Note</Button>
     </form>
   );
 };

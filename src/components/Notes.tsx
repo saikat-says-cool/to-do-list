@@ -88,9 +88,9 @@ export const Notes = () => {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md bg-white/60 dark:bg-black/60 backdrop-blur-lg border-violet-200/50">
       <CardHeader>
-        <CardTitle>My Notes</CardTitle>
+        <CardTitle className="text-center text-2xl font-bold text-primary">My Notes</CardTitle>
       </CardHeader>
       <CardContent>
         <AddNoteForm onAdd={handleAddNote} />
